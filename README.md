@@ -47,7 +47,8 @@ Infra: Kubernetes
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/) (Python package manager)
 - Node.js 20+
 - A Kubernetes cluster (local: [minikube](https://minikube.sigs.k8s.io/) or [kind](https://kind.sigs.k8s.io/))
 - An OpenAI API key
@@ -60,9 +61,8 @@ Infra: Kubernetes
 git clone https://github.com/irfanmanzoor12/32N.git
 cd 32N
 
-# Python services
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+# Python services (uv handles the venv and deps automatically)
+uv sync
 
 # Frontend
 cd ui && npm install
@@ -76,10 +76,10 @@ cp .env.example .env
 
 ```bash
 # MCP Server
-python -m tasks_mcp
+uv run python -m tasks_mcp
 
 # Notifications API
-uvicorn notifications.main:app --reload
+uv run uvicorn notifications.main:app --reload
 
 # Frontend
 cd ui && npm run dev
@@ -111,7 +111,7 @@ This project follows a strict set of working principles defined in [AGENTS.md](.
 
 ```bash
 # Python
-pytest
+uv run pytest
 
 # JavaScript
 npm test
