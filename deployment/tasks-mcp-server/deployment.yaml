@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasks-mcp-server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasks-mcp-server
+  template:
+    metadata:
+      labels:
+        app: tasks-mcp-server
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: tasks-mcp-server
+          # Deploy with SHA tag: ghcr.io/irfanmanzoor12/32n/tasks-mcp-server:<git-sha>
+          image: ghcr.io/irfanmanzoor12/32n/tasks-mcp-server:latest
+          ports:
+            - containerPort: 8000
+              name: mcp
+          envFrom:
+            - configMapRef:
+                name: tasks-mcp-server-config
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

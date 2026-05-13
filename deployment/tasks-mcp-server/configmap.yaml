@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tasks-mcp-server-config
+  namespace: default
+data:
+  MCP_HOST: "0.0.0.0"
+  MCP_PORT: "8000"
+  NOTIFICATIONS_API_URL: "http://notifications-api:8001"
