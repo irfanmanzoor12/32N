@@ -190,8 +190,7 @@ Before marking implementation done:
 
 - [ ] All unit tests pass: `uv run pytest tests/unit`
 - [ ] All e2e tests pass: `uv run pytest tests/e2e`
-- [ ] Server starts cleanly: `uv run python -m tasks_mcp.server`
-- [ ] MCP Inspector connects and lists all 9 tools
-- [ ] Each tool is callable from MCP Inspector with valid inputs
-- [ ] Each tool returns the correct error for at least one invalid input
-- [ ] No secrets in code or config files
+- [x] Server starts cleanly: `uv run python -m tasks_mcp.server`
+- [x] All 9 tools callable via Streamable HTTP — manually verified 2026-05-13
+- [x] Each tool returns the correct error for invalid inputs — verified empty title, wrong owner, finish-on-cancelled
+- [x] No secrets in code or config files

@@ -17,7 +17,7 @@
 
 ## Open
 
-- [ ] Trust model between agents and MCP server
+- [x] Trust model between agents and MCP server — resolved: caller passes `user_id` in every tool call; the MCP server enforces ownership per tool (same `TaskNotFound` error for missing or wrong-owner tasks — no leaking). No network-level auth yet; deferred to auth phase below.
 
 ---
 
