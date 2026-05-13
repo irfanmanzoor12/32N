@@ -1,3 +1,4 @@
+import os
 from mcp.server.fastmcp import FastMCP
 from tasks_mcp.tools.add import tasks_add
 from tasks_mcp.tools.finish import tasks_finish
@@ -9,7 +10,10 @@ from tasks_mcp.tools.list import tasks_list
 from tasks_mcp.tools.focus import tasks_focus
 from tasks_mcp.tools.search import tasks_search
 
-mcp = FastMCP("tasks_mcp", host="127.0.0.1", port=8000, stateless_http=True)
+_host = os.getenv("MCP_HOST", "127.0.0.1")
+_port = int(os.getenv("MCP_PORT", "8000"))
+
+mcp = FastMCP("tasks_mcp", host=_host, port=_port, stateless_http=True)
 
 mcp.tool(name="tasks_add",    annotations={"readOnlyHint": False, "destructiveHint": False, "idempotentHint": False})(tasks_add)
 mcp.tool(name="tasks_finish", annotations={"readOnlyHint": False, "destructiveHint": False, "idempotentHint": True})(tasks_finish)
