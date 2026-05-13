@@ -20,7 +20,7 @@ spec:
       containers:
         - name: tasks-mcp-server
           # Deploy with SHA tag: ghcr.io/irfanmanzoor12/32n/tasks-mcp-server:<git-sha>
-          image: ghcr.io/irfanmanzoor12/32n/tasks-mcp-server:latest
+          image: ghcr.io/irfanmanzoor12/32n/tasks-mcp-server:e2fe2f12a21949c256a1d582e9cb9a0669821815
           ports:
             - containerPort: 8000
               name: mcp
