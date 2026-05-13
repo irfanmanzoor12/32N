@@ -67,6 +67,49 @@ Every decision is made through the lens of running on Kubernetes in production. 
 - Services discover each other by name, not by hardcoded addresses. Configuration lives in Kubernetes Secrets and ConfigMaps, not in `.env` files committed to the repo.
 - No service assumes it is the only instance. All services are stateless and horizontally scalable from the first line of code.
 
+### Image Registry
+
+All container images are published to **GitHub Container Registry (ghcr.io)**. The repository is public, so images are public by default. Image names follow the pattern:
+
+```
+ghcr.io/irfanmanzoor12/32n/<service-name>:latest
+ghcr.io/irfanmanzoor12/32n/<service-name>:<git-sha>
+```
+
+Always tag with both `latest` and the full git SHA. Never deploy `latest` to production — use the SHA tag so deployments are reproducible and rollbacks are exact.
+
+### Dockerfile Location
+
+Every service owns its `Dockerfile` at the root of its directory:
+
+```
+tasks-mcp-server/Dockerfile
+notifications-api/Dockerfile
+tasks-manager-agent/Dockerfile
+ui/Dockerfile
+```
+
+No Dockerfiles at the repo root. Each service builds independently — `docker build -t <image> tasks-mcp-server/` from the repo root.
+
+### Deployment Manifests
+
+All Kubernetes manifests and Helm charts live in `deployment/` at the repo root, organised by service:
+
+```
+deployment/
+├── tasks-mcp-server/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── configmap.yaml
+├── notifications-api/
+│   ├── deployment.yaml
+│   └── service.yaml
+└── helm/
+    └── tasks-system/      # umbrella chart for full-stack deploy
+```
+
+Never commit environment-specific values (cluster URLs, credentials) into `deployment/`. Those live in Kubernetes Secrets and environment-specific values files that are not checked in.
+
 ### Health and Observability are Not Optional
 
 Every service exposes a liveness probe and a readiness probe before it is considered production-ready. If Kubernetes cannot tell whether your service is healthy, your service is not done.
