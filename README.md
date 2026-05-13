@@ -25,9 +25,9 @@ Infra: Kubernetes
 | Component | Role | Technology | Status |
 |---|---|---|---|
 | Tasks MCP Server | Exposes 9 intent-based task tools over MCP | Python + FastMCP | ✅ Built |
+| Notifications API | Dispatches notifications on task events | FastAPI | ✅ Built |
 | Tasks Manager Agent | Primary agent — understands user intent and routes requests | OpenAI Agents SDK | Planned |
 | Appointment Booking Agent | Captures booking details, writes to Google Sheets | OpenAI Agents SDK | Planned |
-| Notifications API | Dispatches notifications on task events | FastAPI | Planned |
 | Frontend | User interface with streaming agent responses | Next.js | Planned |
 | Auth | Session management and login | Better Auth | Planned |
 
@@ -45,8 +45,18 @@ Infra: Kubernetes
 │   │   └── tools/         # One file per tool (add, finish, cancel, defer,
 │   │                      #   update, get, list, focus, search)
 │   └── tests/             # Unit + e2e tests (pytest + pytest-asyncio)
+├── notifications-api/     # Notifications API — task event dispatcher (built)
+│   ├── src/notifications/
+│   │   ├── main.py        # FastAPI app, lifespan, mounts routers
+│   │   ├── schemas.py     # EventType enum, request/response models
+│   │   ├── routers/       # health.py (/health/live, /health/ready)
+│   │   │                  # notify.py (POST /notify)
+│   │   └── services/      # BaseDispatcher ABC + LogDispatcher
+│   └── tests/             # 10 tests (pytest + httpx)
 ├── specs/
-│   └── mcp-server/        # Decisions, implementation plan, tool specs
+│   ├── mcp-server/        # Decisions, implementation plan, tool specs
+│   └── notifications-api/ # Decisions, implementation plan
+├── .mcp.json              # Claude Code MCP connection (tasks server)
 └── AGENTS.md              # Development constitution
 ```
 
@@ -118,6 +128,40 @@ claude mcp add --transport http tasks http://localhost:8000/mcp --scope project
 
 ```bash
 npx @modelcontextprotocol/inspector http://localhost:8000/mcp
+```
+
+---
+
+## Notifications API
+
+Receives task events from the MCP server and dispatches notifications. Currently logs only — real channels (email, push) are plugged in by subclassing `BaseDispatcher`.
+
+### Endpoints
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/notify` | POST | Dispatch a task event notification |
+| `/health/live` | GET | Liveness probe |
+| `/health/ready` | GET | Readiness probe |
+| `/docs` | GET | Swagger UI |
+
+### Event types
+
+`task.finished` · `task.cancelled` · `task.created` · `task.deferred`
+
+### Running
+
+```bash
+cd notifications-api
+uv run uvicorn notifications.main:app --port 8001
+# Swagger UI at http://localhost:8001/docs
+```
+
+### Testing
+
+```bash
+cd notifications-api
+uv run pytest
 ```
 
 ---
