@@ -3,6 +3,7 @@ from typing import Optional
 from tasks_mcp.models import Status
 from tasks_mcp.store import store, TaskNotFound
 from tasks_mcp.tools._helpers import task_response, error_response
+from tasks_mcp.notifications_client import notify_task_finished
 
 
 async def tasks_finish(
@@ -25,4 +26,9 @@ async def tasks_finish(
         )
 
     store.update(task.id, status=Status.complete, completed_at=datetime.now(timezone.utc), completion_note=note)
-    return task_response(store.get_for_user(task.id, user_id))
+    finished_task = store.get_for_user(task.id, user_id)
+    try:
+        await notify_task_finished(finished_task)
+    except Exception:
+        pass
+    return task_response(finished_task)
